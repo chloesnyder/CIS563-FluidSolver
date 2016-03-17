@@ -19,7 +19,6 @@ struct Particle {
     glm::vec3 speed;
     unsigned char r,g,b,a; //color
     float size, angle, weight;
-    float life; //remaining life of particle
     float cameradistance; //squared distnace to camera
     bool operator<(const Particle& that) const {
         //sort in reverse order, far particles drawn first
@@ -29,12 +28,20 @@ struct Particle {
 
 class fluidSolver {
 public:
-    int FindUnusedParticle();
 
-    int ParticlesCount;
+    std::vector<GLfloat> g_particule_position_size_data;
+    std::vector<GLubyte> g_particule_color_data;
+    int MaxParticles;
+    std::vector<Particle*> ParticlesContainer;
+
+    int ParticlesCount = 0;
     GLuint billboard_vertex_buffer;
     GLuint particles_position_buffer;
     GLuint particles_color_buffer;
+    GLuint texture;
+    GLuint texture_file;
+    GLuint CameraRight_worldspace_ID;
+    GLuint CameraUp_worldspace_ID;
 
     void setParticleBuffers();
     void updateParticleBuffers();
@@ -42,8 +49,8 @@ public:
     void destroy();
 
     void sortParticles();
-
-    void updateParticles(float delta, glm::vec3 CameraPosition);
+    //void updateParticles(float delta, glm::vec3 CameraPosition);
+    void initParticles();
 
     GLuint particlevertexbuffer;
     GLuint particleindexbuffer;
@@ -52,6 +59,11 @@ public:
     GLint unifViewProj;
     GLint attrPos;
     GLint attrCol;
+
+    float particle_separation;
+    float boundX;
+    float boundY;
+    float boundZ;
 
 };
 

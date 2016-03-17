@@ -12,10 +12,12 @@ class scene{
 public:
     scene();
     ~scene();
-    triangle* t;
     container* c;
     camera* scene_camera;
     fluidSolver* fluid_solver;
+
+//    GLuint CameraRight_worldspace_ID;
+//    GLuint CameraUp_worldspace_ID;
 
     void drawScene(GLFWwindow* window);
     void destroyScene();
@@ -30,7 +32,9 @@ public:
     GLuint MatrixID;
     GLuint wireMatID;
 
+    float delta = .05;
     void keyPressEvent(GLFWwindow* window);
+    void loadJSON(const char* file);
 
 
 };

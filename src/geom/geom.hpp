@@ -19,14 +19,6 @@ public:
     virtual void destroy() {};
     virtual void draw() {};
 
-//    GLuint vertexbuffer;
-//    GLuint indexbuffer;
-//    GLuint colorbuffer;
-
-//    GLint unifViewProj;
-//    GLint attrPos;
-//    GLint attrCol;
-
 };
 
 

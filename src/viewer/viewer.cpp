@@ -3,6 +3,7 @@
 //  Thanda
 
 #include "viewer.hpp"
+#include <ctime>
 
 using namespace glm;
 using namespace std;
@@ -60,18 +61,19 @@ int viewer::loadWindow() {
         //clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Draw scene
+        //draw scene
         sc->drawScene(window);
-
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
+
 
     } // Check if the ESC key was pressed or the window was closed
 
     while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
            glfwWindowShouldClose(window) == 0 );
     sc->destroyScene();
+    delete sc;
     glDeleteVertexArrays(1, &VertexArrayID);
     glfwTerminate();
     return 0;
