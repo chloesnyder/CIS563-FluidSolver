@@ -24,6 +24,10 @@ struct Particle {
         //sort in reverse order, far particles drawn first
         return this->cameradistance > that.cameradistance;
     }
+
+    float rho; //density
+    float mass;
+    float pres;
 };
 
 class fluidSolver {

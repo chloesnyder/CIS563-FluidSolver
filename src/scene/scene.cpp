@@ -22,9 +22,9 @@ void scene::initScene(){
     fluid_solver = new fluidSolver();
 
     //load shaders
-    fluid_solver->texture_file = shade.loadDDS("../CIS563-FluidSolver-master/src/shader/particle.DDS");
-    prog_wire = shade.LoadShaders("../CIS563-FluidSolver-master/src/shader/wire.vert","../CIS563-FluidSolver-master/src/shader/wire.frag");
-    prog_particle = shade.LoadShaders("../CIS563-FluidSolver-master/src/shader/particle.vert","../CIS563-FluidSolver-master/src/shader/particle.frag");
+    fluid_solver->texture_file = shade.loadDDS("../CIS563-FluidSolver/src/shader/particle.DDS");
+    prog_wire = shade.LoadShaders("../CIS563-FluidSolver/src/shader/wire.vert","../CIS563-FluidSolver/src/shader/wire.frag");
+    prog_particle = shade.LoadShaders("../CIS563-FluidSolver/src/shader/particle.vert","../CIS563-FluidSolver/src/shader/particle.frag");
 
 
     //create camera and geometry
@@ -32,7 +32,7 @@ void scene::initScene(){
     c = new container();
     scene_camera->create();
 
-    loadJSON("../CIS563-FluidSolver-master/src/shader/scene.json");
+    loadJSON("../CIS563-FluidSolver/src/shader/scene.json");
     c->create();
     fluid_solver->setParticleBuffers();
     fluid_solver->initParticles();

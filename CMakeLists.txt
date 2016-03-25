@@ -91,6 +91,9 @@ set(CORE_SRC
 	src/geom/triangle.cpp
 	src/shader/shader.cpp
 	src/geom/container.cpp
+        src/fluidSolver/particle.cpp
+        src/fluidSolver/grid.cpp
+        src/fluidSolver/SPHSolver.cpp
 )
 
 add_executable(Thanda ${CORE_SRC})
