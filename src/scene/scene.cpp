@@ -19,7 +19,9 @@ scene::~scene(){
 }
 
 void scene::initScene(){
-    fluid_solver = new fluidSolver();
+    fluid_solver = new SPHSolver();
+   // SPH_solver = new SPHSolver();
+    
 
     //load shaders
     fluid_solver->texture_file = shade.loadDDS("../CIS563-FluidSolver/src/shader/particle.DDS");
@@ -36,6 +38,7 @@ void scene::initScene(){
     c->create();
     fluid_solver->setParticleBuffers();
     fluid_solver->initParticles();
+    fluid_solver->init(.225);
 
     //send data to shader
     c->unifViewProj = glGetUniformLocation(prog_wire, "u_viewProj");
@@ -92,10 +95,9 @@ void scene::drawScene(GLFWwindow* window){
     for(int i=0; i<fluid_solver->ParticlesContainer.size(); i++){
 
         Particle* p = fluid_solver->ParticlesContainer[i]; // shortcut
-
-
+        
         // Simulate simple physics : gravity only, no collisions
-        p->speed += glm::vec3(0.0f,-9.81f, 0.0f) * delta * 0.5f;
+        p->speed += 0; //glm::vec3(0.0f,-9.81f, 0.0f) * delta * 0.5f; //TURN OFF GRAVITY
         p->pos += p->speed * delta;
         p->cameradistance = glm::length2( p->pos - CameraPosition );
 
@@ -105,17 +107,22 @@ void scene::drawScene(GLFWwindow* window){
         fluid_solver->g_particule_position_size_data[4*i+1] =  p->pos.y;
         fluid_solver->g_particule_position_size_data[4*i+2] = p->pos.z;
         fluid_solver->g_particule_position_size_data[4*i+3] = 0.05f/*p.size*/;
-
-
-//        fluid_solver->g_particule_position_size_data[4*fluid_solver->ParticlesCount+3] = 0.05f/*p.size*/;
-
-        fluid_solver->g_particule_color_data[4*i+0] = 252;
-        fluid_solver->g_particule_color_data[4*i+1] = 0;
-        fluid_solver->g_particule_color_data[4*i+2] = 0;
+        
+        fluid_solver->g_particule_color_data[4*i+0] = p->r;
+        fluid_solver->g_particule_color_data[4*i+1] = p->g;
+        fluid_solver->g_particule_color_data[4*i+2] = p->b;
         fluid_solver->g_particule_color_data[4*i+3] = 250;
 
         fluid_solver->ParticlesCount++;
     }
+    
+    
+
+    //UNIT TESTING
+    std::cout << "poly6 kernel: " << fluid_solver->poly6_kernel(glm::vec3(0,0,0), glm::vec3(.1,.1,.1)) << std::endl;
+    std::cout << "spiky kernel: " << fluid_solver->spiky_kernel(glm::vec3(0,0,0), glm::vec3(.1,.1,.1)) << std::endl;
+    fluid_solver->neighborSearchUSG(fluid_solver->ParticlesContainer[4]);
+
 
     //fluid_solver->updateParticles(.5, CameraPosition);
     fluid_solver->updateParticleBuffers();
@@ -212,12 +219,20 @@ void scene::loadJSON(const char* filepath) {
     float boundY = root["particleDim"]["boundY"].asFloat();
     float boundZ = root["particleDim"]["boundZ"].asFloat();
 
-    c->maxX = scaleX / 2;
-    c->maxY = scaleY / 2;
-    c->maxZ = scaleZ / 2;
-    c->minX = -scaleX / 2;
-    c->minY = -scaleY / 2;
-    c->minZ = -scaleZ / 2;
+//    c->maxX = scaleX / 2;
+//    c->maxY = scaleY / 2;
+//    c->maxZ = scaleZ / 2;
+//    c->minX = -scaleX / 2;
+//    c->minY = -scaleY / 2;
+//    c->minZ = -scaleZ / 2;
+    
+    
+    c->maxX = scaleX;
+    c->maxY = scaleY;
+    c->maxZ = scaleZ;
+    c->minX = 0;
+    c->minY = 0;
+    c->minZ = 0;
 
     fluid_solver->particle_separation = particleSeparation;
     fluid_solver->boundX = boundX;

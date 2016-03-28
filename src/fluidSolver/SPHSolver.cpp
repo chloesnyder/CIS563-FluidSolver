@@ -10,7 +10,7 @@ SPHSolver::SPHSolver()
     h2 = h*h;
     h6 = pow(h, 6);
     d_rest_density = 1000;
-    m_mass = pow((2/3*h), 3) * d_rest_density;
+    m_mass = 1;
     dt_timestep = 1;
     usg = grid();
     epsilon = .003;
@@ -21,14 +21,15 @@ void SPHSolver::init(float r){
     //bound min/max of container = grid min and max
     //radius = how big each square is
 
-   usg = grid(glm::ivec3(ceil(2*boundX/r),ceil(2*boundY/r),ceil(2*boundZ/r)));
+    usg = grid(0, boundX, .5);
 
     //compute cell indices of particle based on particle position
     for(Particle* p : ParticlesContainer) {
         int i = floor(p->pos.x);
         int j = floor(p->pos.y);
         int k = floor(p->pos.z);
-        usg.particles.at(usg(i,j,k)).push_back(p);
+        p->gridIndex = usg(i,j,k);
+        usg.particles.at(p->gridIndex).push_back(p);
     }
 
     for(Particle* p1 : ParticlesContainer) {
@@ -49,8 +50,14 @@ std::vector<Particle*> SPHSolver::neighborSearchNaive(Particle* p){
 //returns the grid cell (particle p + it's neighbors)
 //circumvent this by having an epsilon value - takes more time to remove the particle
 std::vector<Particle*> SPHSolver::neighborSearchUSG(Particle* p){
-    int index = usg(p->pos.x, p->pos.y, p->pos.z);
-    return usg.particles.at(index);
+    for(Particle* n : usg.particles.at(p->gridIndex)) {
+        p->a = 1;
+        p->r = 0;
+        p->g = 225;
+        p->b = 0;
+    }
+    std::cout << p->gridIndex << std::endl;
+    return usg.particles.at(p->gridIndex);
 }
 
 float SPHSolver::poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos){
@@ -79,7 +86,7 @@ float SPHSolver::accumulateDensity(float mass, glm::vec3 pos, std::vector<Partic
     float rho;
 
     for(Particle* n : neighbors) {
-        float kernel = spiky_kernel(pos, n->pos);
+        float kernel = poly6_kernel(pos, n->pos);
         rho += n->mass*kernel;
     }
     return rho;

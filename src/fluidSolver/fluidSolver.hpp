@@ -28,6 +28,7 @@ struct Particle {
     float rho; //density
     float mass;
     float pres;
+    int gridIndex;
 };
 
 class fluidSolver {

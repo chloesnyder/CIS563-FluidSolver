@@ -7,6 +7,7 @@
 #include "../shader/shader.hpp"
 #include "../camera/camera.hpp"
 #include "../fluidSolver/fluidSolver.hpp"
+#include "../fluidSolver/sphsolver.h"
 
 class scene{
 public:
@@ -14,7 +15,8 @@ public:
     ~scene();
     container* c;
     camera* scene_camera;
-    fluidSolver* fluid_solver;
+    SPHSolver* fluid_solver;
+    //SPHSolver* SPH_solver;
 
 //    GLuint CameraRight_worldspace_ID;
 //    GLuint CameraUp_worldspace_ID;

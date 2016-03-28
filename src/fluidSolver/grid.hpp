@@ -6,11 +6,14 @@
 
 class grid {
 public:
-    grid(glm::ivec3 dim);
+    grid(int grid_min, int grid_max, float resolution);
     grid();
     int operator() (int i, int j, int k);
     glm::vec3 dimensions;
     std::vector<std::vector<Particle*>> particles;
+    int grid_min;
+    int grid_max;
+    float resolution;
 };
 
 

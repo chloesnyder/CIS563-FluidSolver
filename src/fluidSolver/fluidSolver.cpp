@@ -103,8 +103,6 @@ void fluidSolver::destroy() {
     for(Particle* p : ParticlesContainer) {
         delete p;
     }
-//    delete[] g_particule_position_size_data;
-//    delete[] g_particule_color_data;
 
     // Cleanup VBO and shader
     glDeleteTextures(1, &texture_file);
@@ -118,11 +116,15 @@ void fluidSolver::sortParticles() {
 }
 
 void fluidSolver::initParticles() {
-    for(float i = -boundX/2; i < boundX/2; i += particle_separation) {
-        for(float j = -boundY/2; j < boundY/2; j += particle_separation) {
-            for(float k = -boundZ/2; k < boundZ/2; k += particle_separation) {
+    for(float i = 0; i < boundX; i += particle_separation) {
+        for(float j = 0; j < boundY; j += particle_separation) {
+            for(float k = 0; k < boundZ; k += particle_separation) {
                 Particle* P = new Particle();
                 P->pos = glm::vec3(i,j,k);
+                P->r = 225;
+                P->g = 0;
+                P->b = 0;
+                P->a = 250;
                 ParticlesContainer.push_back(P);
             }
         }

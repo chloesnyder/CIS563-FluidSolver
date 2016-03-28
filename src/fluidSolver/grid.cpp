@@ -1,8 +1,11 @@
 #include "grid.hpp"
 
-grid::grid(glm::ivec3 dim)
+grid::grid(int grid_min, int grid_max, float cell_size)
 {
-    dimensions = dim;
+    this->resolution = ceil((grid_max - grid_min) / cell_size);
+    particles.resize(resolution*resolution*resolution);
+    this->grid_max = grid_max;
+    this->grid_min = grid_min;
 }
 grid::grid() {
 
@@ -10,6 +13,6 @@ grid::grid() {
 
 int grid::operator() (int i, int j, int k) {
     //grid indexing method
-    return (dimensions.z*dimensions.z*k) + (dimensions.y*j) + i;
+    return (resolution*resolution*k) + (resolution*j) + i;
 }
 

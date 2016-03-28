@@ -1,13 +1,27 @@
 {
-	"containerDim" : {
-		"scaleX" : 5.0,
-		"scaleY" : 5.0,
-		"scaleZ" : 5.0
-	},
-	"particleDim" : {
-		"boundX" : 3.7,
-		"boundY" : 3.7,
-		"boundZ" : 3.7
-	},
-	"particleSeparation" : 0.1
+    "containerDim" : {
+        "scaleX" : 2.0,
+        "scaleY" : 2.0,
+        "scaleZ" : 2.0
+    },
+    "particleDim" : {
+        "boundX" : 2.0,
+        "boundY" : 2.0,
+        "boundZ" : 2.0
+    },
+    "particleSeparation" : 0.5
 }
+
+//{
+//	"containerDim" : {
+//		"scaleX" : 5.0,
+//		"scaleY" : 5.0,
+//		"scaleZ" : 5.0
+//	},
+//	"particleDim" : {
+//		"boundX" : 3.7,
+//		"boundY" : 3.7,
+//		"boundZ" : 3.7
+//	},
+//	"particleSeparation" : 0.1
+//}
