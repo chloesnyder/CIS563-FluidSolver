@@ -14,3 +14,6 @@ Fluid Solver Submission guidelines:
 
 
 And you're done!
+
+Unit tests:
+The unit tests
