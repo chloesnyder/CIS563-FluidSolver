@@ -31,10 +31,23 @@ void SPHSolver::init(float r){
         p->gridIndex = usg(i,j,k);
         usg.particles.at(p->gridIndex).push_back(p);
     }
-
     for(Particle* p1 : ParticlesContainer) {
+        //find density and pressure
         p1->rho = accumulateDensity(p1->mass, p1->pos, neighborSearchUSG(p1)); //pass in cell to get density
         p1->pres = calculatePressure(p1->rho);
+        //resolve forces
+        p1->f_pressure = pressureForceDensity(p1);
+        p1->f_gravity = p1->rho * glm::vec3(0, -9.8, 0);
+        p1->force_density = p1->f_pressure + p1->f_gravity;
+    }
+    update(0);
+}
+
+void SPHSolver::update(int t) {
+    //update particle velocity + positions
+    for(Particle* p: ParticlesContainer) {
+        p->speed += (glm::vec3(t) * p->force_density)/glm::vec3(p->rho);
+        p->pos += glm::vec3(t)*p->speed;
     }
 }
 
@@ -84,7 +97,6 @@ float SPHSolver::spiky_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos){
 
 float SPHSolver::accumulateDensity(float mass, glm::vec3 pos, std::vector<Particle*> neighbors) {
     float rho;
-
     for(Particle* n : neighbors) {
         float kernel = poly6_kernel(pos, n->pos);
         rho += n->mass*kernel;
@@ -93,5 +105,27 @@ float SPHSolver::accumulateDensity(float mass, glm::vec3 pos, std::vector<Partic
 }
 
 float SPHSolver::calculatePressure(float rho) {
-    return k_stiffness*(rho - d_rest_density);
+    return fmax(0,k_stiffness*(rho - d_rest_density));
+}
+
+glm::vec3 SPHSolver::spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos){
+    float x = glm::length2(pj_pos - pi_pos);
+    if(epsilon <= x && x <= h) {
+        float constant = -45/(M_PI * h6);
+        float mult = (h - x)*(h - x);
+        return constant*mult*(pj_pos - pi_pos);
+    } else {
+        return glm::vec3(0);
+    }
+}
+
+glm::vec3 SPHSolver::pressureForceDensity(Particle* p){
+    glm::vec3 PFD = glm::vec3(0);
+    //summation equation
+    for(Particle* n: usg.particles.at(p->gridIndex)) {
+        glm::vec3 kernel = spiky_kernel_grad(p->pos, n->pos);
+        float pressure = (p->pres + n->pres)/2;
+        PFD += (n->mass / n->rho)*pressure*kernel;
+    }
+    return -(PFD);
 }

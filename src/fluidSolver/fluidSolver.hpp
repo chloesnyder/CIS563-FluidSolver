@@ -29,6 +29,9 @@ struct Particle {
     float mass;
     float pres;
     int gridIndex;
+    glm::vec3 f_pressure;
+    glm::vec3 f_gravity;
+    glm::vec3 force_density;
 };
 
 class fluidSolver {

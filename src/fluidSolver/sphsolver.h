@@ -30,11 +30,14 @@ public:
 
     float accumulateDensity(float mass, glm::vec3 pos, std::vector<Particle*> neighbors);
     float calculatePressure(float rho);
+    glm::vec3 pressureForceDensity(Particle* p);
+    void update(int t);
 
 
     //kernel functions
-    float poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos);
-    float spiky_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos);
+    float poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //density
+    float spiky_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //pressure, use gradient
+    glm::vec3 spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos);
 
 };
 
