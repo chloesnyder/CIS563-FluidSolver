@@ -26,7 +26,7 @@ struct Particle {
     }
 
     float rho; //density
-    float mass;
+    float mass = 1;
     float pres;
     int gridIndex;
     glm::vec3 f_pressure;

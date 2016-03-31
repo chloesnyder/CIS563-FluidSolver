@@ -1,12 +1,6 @@
 #include "container.hpp"
 
 container::container() {
-    minX = -1;
-    minY = -1;
-    minZ = -1;
-    maxX = 1;
-    maxY = 1;
-    maxZ = 1;
 
 }
 
@@ -23,6 +17,14 @@ void container::create() {
     vert_pos[5] = glm::vec3(maxX, maxY, minZ);
     vert_pos[6] = glm::vec3(maxX, maxY, maxZ);
     vert_pos[7] = glm::vec3(maxX, minY, maxZ);
+//    vert_pos[0] = glm::vec3(-2);
+//    vert_pos[1] = glm::vec3(-2, 2,-2);
+//    vert_pos[2] = glm::vec3(-2, 2, 2);
+//    vert_pos[3] = glm::vec3(-2, -2, 2);
+//    vert_pos[4] = glm::vec3(2, -2, -2);
+//    vert_pos[5] = glm::vec3(2, 2, -2);
+//    vert_pos[6] = glm::vec3(2, 2, 2);
+//    vert_pos[7] = glm::vec3(2, -2, 2);
 
     for(int i = 0; i < 8; i++) {
         vert_col[i] = glm::vec3(1,1,1);

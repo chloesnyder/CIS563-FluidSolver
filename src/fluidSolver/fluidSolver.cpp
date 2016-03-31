@@ -4,6 +4,7 @@
 
 #include "fluidSolver.hpp"
 #include <vector>
+#include <algorithm>
 
 
 int LastUsedParticle = 0;
@@ -116,9 +117,9 @@ void fluidSolver::sortParticles() {
 }
 
 void fluidSolver::initParticles() {
-    for(float i = 0; i < boundX; i += particle_separation) {
-        for(float j = 0; j < boundY; j += particle_separation) {
-            for(float k = 0; k < boundZ; k += particle_separation) {
+    for(float i = 0.5; i < boundX; i += particle_separation) {
+        for(float j = 0.5; j < boundY; j += particle_separation) {
+            for(float k = 0.5; k < boundZ; k += particle_separation) {
                 Particle* P = new Particle();
                 P->pos = glm::vec3(i,j,k);
                 P->r = 225;
@@ -129,6 +130,7 @@ void fluidSolver::initParticles() {
             }
         }
     }
+    
   //  std::cout << ParticlesContainer.size() << std::endl;
     MaxParticles = ParticlesContainer.size();
 }

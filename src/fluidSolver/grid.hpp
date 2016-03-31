@@ -10,10 +10,11 @@ public:
     grid();
     int operator() (int i, int j, int k);
     glm::vec3 dimensions;
-    std::vector<std::vector<Particle*>> particles;
+    std::vector<std::vector<Particle*>> cells;
     int grid_min;
     int grid_max;
     float resolution;
+    float cell_size;
 };
 
 

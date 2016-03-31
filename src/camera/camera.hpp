@@ -12,7 +12,7 @@
 
 class camera {
 public:
-    constexpr static const float DEG2RAD = 3.14f / 180.f;
+    constexpr static const float DEG2RAD = 3.14f / 180.f; //Debanshu says this is better, he thinks #defines are bad
     camera();
     ~camera();
     void create();

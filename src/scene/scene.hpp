@@ -16,6 +16,7 @@ public:
     container* c;
     camera* scene_camera;
     SPHSolver* fluid_solver;
+    int t;
     //SPHSolver* SPH_solver;
 
 //    GLuint CameraRight_worldspace_ID;

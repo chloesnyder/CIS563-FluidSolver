@@ -28,10 +28,11 @@ public:
     std::vector<Particle*> neighborSearchNaive(Particle* p);
     std::vector<Particle*> neighborSearchUSG(Particle* p);
 
-    float accumulateDensity(float mass, glm::vec3 pos, std::vector<Particle*> neighbors);
+//    float accumulateDensity(float mass, glm::vec3 pos, const std::vector<Particle*>& neighbors);
+    float accumulateDensity(const Particle* p);
     float calculatePressure(float rho);
     glm::vec3 pressureForceDensity(Particle* p);
-    void update(int t);
+    void update();
 
 
     //kernel functions
