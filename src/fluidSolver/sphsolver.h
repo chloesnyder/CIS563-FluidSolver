@@ -13,6 +13,7 @@ public:
     float h9;
     float h2;
     float h6;
+    float h3;
     float m_mass;
 
     float d_rest_density;
@@ -32,13 +33,14 @@ public:
     float accumulateDensity(const Particle* p);
     float calculatePressure(float rho);
     glm::vec3 pressureForceDensity(Particle* p);
+    glm::vec3 viscForceDensity(Particle* p);
     void update();
 
 
     //kernel functions
     float poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //density
-    float spiky_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //pressure, use gradient
-    glm::vec3 spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos);
+    glm::vec3 spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos); //pressure
+    float viscous_kernel_grad_2(glm::vec3 pi_pos, glm::vec3 pj_pos); //visc
 
 };
 

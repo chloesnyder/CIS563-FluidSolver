@@ -32,6 +32,7 @@ struct Particle {
     glm::vec3 f_pressure;
     glm::vec3 f_gravity;
     glm::vec3 force_density;
+    glm::vec3 f_visc;
 };
 
 class fluidSolver {
