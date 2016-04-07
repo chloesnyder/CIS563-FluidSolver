@@ -33,6 +33,14 @@ struct Particle {
     glm::vec3 f_gravity;
     glm::vec3 force_density;
     glm::vec3 f_visc;
+    
+    //3d grid indices
+    int i;
+    int j;
+    int k;
+    
+    //QUESTION: Does it make more sense to store neighbors in the particle, or not?
+    std::vector<Particle*> neighbors;
 };
 
 class fluidSolver {

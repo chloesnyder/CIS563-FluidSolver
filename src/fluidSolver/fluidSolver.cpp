@@ -131,7 +131,14 @@ void fluidSolver::initParticles() {
         }
     }
     
-  //  std::cout << ParticlesContainer.size() << std::endl;
+    Particle* pp = new Particle();
+    pp->pos = glm::vec3(-2, -2, -2);
+    pp->r = 0;
+    pp->g = 0;
+    pp->b = 225;
+    pp->a = 250;
+    ParticlesContainer.push_back(pp);
+
     MaxParticles = ParticlesContainer.size();
 }
 

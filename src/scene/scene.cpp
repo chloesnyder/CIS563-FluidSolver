@@ -38,7 +38,7 @@ void scene::initScene(){
     c->create();
     fluid_solver->setParticleBuffers();
     fluid_solver->initParticles();
-    fluid_solver->init(.10001);
+    fluid_solver->init();
 
     //send data to shader
     c->unifViewProj = glGetUniformLocation(prog_wire, "u_viewProj");

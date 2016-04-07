@@ -22,7 +22,7 @@ public:
     float epsilon;
 
     SPHSolver();
-    void init(float r);
+    void init();
     void addParticle(Particle* p);
 
     //neighbor search
@@ -30,11 +30,13 @@ public:
     std::vector<Particle*> neighborSearchUSG(Particle* p);
 
 //    float accumulateDensity(float mass, glm::vec3 pos, const std::vector<Particle*>& neighbors);
-    float accumulateDensity(const Particle* p);
+    float accumulateDensity(Particle* p);
     float calculatePressure(float rho);
     glm::vec3 pressureForceDensity(Particle* p);
     glm::vec3 viscForceDensity(Particle* p);
     void update();
+    
+    void checkBounds(Particle* p);
 
 
     //kernel functions
