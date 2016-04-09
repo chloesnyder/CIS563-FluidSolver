@@ -9,6 +9,6 @@
 		"boundY" : 1.5,
 		"boundZ" : 1.5
 	},
-	"particleSeparation" : 0.05
+	"particleSeparation" : 0.025
 }
 

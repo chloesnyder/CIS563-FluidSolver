@@ -17,6 +17,7 @@
 struct Particle {
     glm::vec3 pos;
     glm::vec3 speed;
+    int id;
     unsigned char r,g,b,a; //color
     float size, angle, weight;
     float cameradistance; //squared distnace to camera
@@ -26,7 +27,7 @@ struct Particle {
     }
 
     float rho; //density
-    float mass = 1;
+    float mass = 0.125f;
     float pres;
     int gridIndex;
     glm::vec3 f_pressure;
@@ -67,7 +68,7 @@ public:
 
     void sortParticles();
     //void updateParticles(float delta, glm::vec3 CameraPosition);
-    void initParticles();
+    virtual void initParticles()=0;
 
     GLuint particlevertexbuffer;
     GLuint particleindexbuffer;

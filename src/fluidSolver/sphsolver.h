@@ -20,11 +20,11 @@ public:
     float dt_timestep;
     grid usg;
     float epsilon;
-
+    float cellsize;
     SPHSolver();
     void init();
     void addParticle(Particle* p);
-
+    void initParticles();
     //neighbor search
     std::vector<Particle*> neighborSearchNaive(Particle* p);
     std::vector<Particle*> neighborSearchUSG(Particle* p);

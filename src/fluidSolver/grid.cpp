@@ -17,3 +17,6 @@ int grid::operator() (int i, int j, int k) {
     return (resolution*resolution*k) + (resolution*j) + i;
 }
 
+int grid::zIndex(int i, int j, int k) {
+   
+}

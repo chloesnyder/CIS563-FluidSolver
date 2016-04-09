@@ -15,6 +15,7 @@ public:
     int grid_max;
     float resolution;
     float cell_size;
+    int zIndex(int i, int j, int k);
 };
 
 

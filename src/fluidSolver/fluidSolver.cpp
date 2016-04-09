@@ -116,29 +116,3 @@ void fluidSolver::sortParticles() {
     std::sort(&ParticlesContainer[0], &ParticlesContainer[MaxParticles]);
 }
 
-void fluidSolver::initParticles() {
-    for(float i = 0.5; i < boundX; i += particle_separation) {
-        for(float j = 0.5; j < boundY; j += particle_separation) {
-            for(float k = 0.5; k < boundZ; k += particle_separation) {
-                Particle* P = new Particle();
-                P->pos = glm::vec3(i,j,k);
-                P->r = 225;
-                P->g = 0;
-                P->b = 0;
-                P->a = 250;
-                ParticlesContainer.push_back(P);
-            }
-        }
-    }
-    
-    Particle* pp = new Particle();
-    pp->pos = glm::vec3(-2, -2, -2);
-    pp->r = 0;
-    pp->g = 0;
-    pp->b = 225;
-    pp->a = 250;
-    ParticlesContainer.push_back(pp);
-
-    MaxParticles = ParticlesContainer.size();
-}
-
