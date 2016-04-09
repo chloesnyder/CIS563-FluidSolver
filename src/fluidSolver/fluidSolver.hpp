@@ -13,10 +13,11 @@
 #include <glm/gtx/norm.hpp>
 #include <iostream>
 #include "glm/gtx/string_cast.hpp"
-
+#include <tbb/tbb.h>
+#include "tbb/concurrent_vector.h"
 struct Particle {
     glm::vec3 pos;
-    glm::vec3 speed;
+    glm::vec3 speed = glm::vec3(0, -9.80, 0);
     int id;
     unsigned char r,g,b,a; //color
     float size, angle, weight;
@@ -41,7 +42,7 @@ struct Particle {
     int k;
     
     //QUESTION: Does it make more sense to store neighbors in the particle, or not?
-    std::vector<Particle*> neighbors;
+    tbb::concurrent_vector<Particle*> neighbors;
 };
 
 class fluidSolver {

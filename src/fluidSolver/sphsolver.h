@@ -4,6 +4,9 @@
 #include "grid.hpp"
 #include "fluidSolver.hpp"
 
+
+using namespace tbb;
+
 class SPHSolver : public fluidSolver
 {
 public:
@@ -23,13 +26,17 @@ public:
     float cellsize;
     SPHSolver();
     void init();
-    void addParticle(Particle* p);
     void initParticles();
+    
+    /* ----------------
+    NON TBB
+     -----------*/
+    
     //neighbor search
     std::vector<Particle*> neighborSearchNaive(Particle* p);
-    std::vector<Particle*> neighborSearchUSG(Particle* p);
-
-//    float accumulateDensity(float mass, glm::vec3 pos, const std::vector<Particle*>& neighbors);
+    concurrent_vector<Particle*> neighborSearchUSG(Particle* p);
+    void not_TBB_update();
+    
     float accumulateDensity(Particle* p);
     float calculatePressure(float rho);
     glm::vec3 pressureForceDensity(Particle* p);
@@ -43,6 +50,23 @@ public:
     float poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //density
     glm::vec3 spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos); //pressure
     float viscous_kernel_grad_2(glm::vec3 pi_pos, glm::vec3 pj_pos); //visc
+    
+    /* ----------------
+     TBB
+     -----------*/
+    
+    //neighbor search
+    concurrent_vector<Particle*> tbb_neighborSearchNaive(Particle* p);    
+    float tbb_accumulateDensity(Particle* p);
+    float tbb_calculatePressure(float rho);
+    glm::vec3 tbb_pressureForceDensity(Particle* p);
+    glm::vec3 tbb_viscForceDensity(Particle* p);
+    
+    
+    //kernel functions
+//    float poly6_kernel(glm::vec3 pi_pos, glm::vec3 pj_pos); //density
+//    glm::vec3 spiky_kernel_grad(glm::vec3 pi_pos, glm::vec3 pj_pos); //pressure
+//    float viscous_kernel_grad_2(glm::vec3 pi_pos, glm::vec3 pj_pos); //visc
 
 };
 

@@ -9,7 +9,7 @@ SPHSolver::SPHSolver()
 {
     k_stiffness = 1000;
     mu_viscosity = 25;
-    h = .10001; //radius
+    h = .1;//.11001; //radius
     cellsize = 0.5f*h;
 
     h9 = h*h*h*h*h*h*h*h*h;
@@ -39,14 +39,14 @@ void SPHSolver::initParticles() {
     //ParticlesContainer.push_back(p1);
     //ParticlesContainer.push_back(p2);
     
-    for(float i = 0.5; i < boundX; i += particle_separation) {
-        for(float j = 0.5; j < boundY; j += particle_separation) {
-            for(float k = 0.5; k < boundZ; k += particle_separation) {
+    for(float i = 0; i < .3; i += particle_separation) {
+        for(float j = 0; j < 3; j += particle_separation) {
+            for(float k = 0; k < 2; k += particle_separation) {
                 Particle* P = new Particle();
                 P->pos = glm::vec3(i,j,k);
-                P->r = 225;
+                P->r = 0;
                 P->g = 0;
-                P->b = 0;
+                P->b = 200;
                 P->a = 250;
                 P->id = particleId++;
                 ParticlesContainer.push_back(P);
@@ -54,79 +54,49 @@ void SPHSolver::initParticles() {
         }
     }
     
-    //    Particle* pp = new Particle();
-    //    pp->pos = glm::vec3(-2, -2, -2);
-    //    pp->r = 0;
-    //    pp->g = 0;
-    //    pp->b = 225;
-    //    pp->a = 250;
-    //    ParticlesContainer.push_back(pp);
-    
     MaxParticles = ParticlesContainer.size();
 }
 
 
 
 void SPHSolver::checkBounds(Particle* p) {
-    float bound = 2.f;
-    if(p->pos.x > bound) { //hardcode for now, change later to access correct container scaleMax and mins
-        p->pos.x = bound - epsilon;
-        p->speed *= glm::vec3(-0.001,1,1);
+    float boundx = 4.f;
+    float boundy = 3.f;
+    float boundz = 2.f;
+    if(p->pos.x > boundx) { //hardcode for now, change later to access correct container scaleMax and mins
+        p->pos.x = boundx - epsilon;
+        p->speed *= glm::vec3(-1.1,1,1);
         //std::cout << "here  > x" << std::endl;
     } else if (p->pos.x < 0) {
         p->pos.x = 0 + epsilon;
-        p->speed *= glm::vec3(-0.001,1,1);
+        p->speed *= glm::vec3(-1.1,1,1);
         //std::cout << "here  < x" << std::endl;
     }
     
-    if(p->pos.y > bound) { //hardcode for now, change later to access correct container scaleMax and mins
-        p->pos.y = bound - epsilon;
-        p->speed *= glm::vec3(1,-0.001,1);
+    if(p->pos.y > boundy) { //hardcode for now, change later to access correct container scaleMax and mins
+        p->pos.y = boundy - epsilon;
+        p->speed *= glm::vec3(1,-1,1);
       //  std::cout << "here  < y" << std::endl;
     } else if (p->pos.y < 0) {
         p->pos.y = 0 + epsilon;
-        p->speed *= glm::vec3(1, -0.001, 1);
+        p->speed *= glm::vec3(1, -.5, 1);
         //std::cout << "here  > y" << std::endl;
     }
     
-    if(p->pos.z > bound) { //hardcode for now, change later to access correct container scaleMax and mins
-        p->pos.z = bound - epsilon;
-        p->speed *= glm::vec3(1,1,-0.001);
+    if(p->pos.z > boundz) { //hardcode for now, change later to access correct container scaleMax and mins
+        p->pos.z = boundz - epsilon;
+        p->speed *= glm::vec3(1,1,-1.1);
         //std::cout << "here  < z" << std::endl;
     } else if (p->pos.z < 0) {
         p->pos.z = 0 + epsilon;
-        p->speed *= glm::vec3(1,1,-0.001);
+        p->speed *= glm::vec3(1,1,-1.1);
         // std::cout << "here  > z" << std::endl;
     }
 
 }
 
 void SPHSolver::init(){
-    //bound min/max of container = grid min and max
-    //radius = how big each square is
-
-    usg = grid(0, 2, cellsize); // cell size should be related to h
-    // yes bigger cell size gives me more neighbors per cell
-    // but eventually my neighbors run out
-    // WHY?
-    
-    // hypothesis - it looks like too many particles are in a small space - > causing pressure force to separate them,
-    // but the scale of that force is too high.
-    
-    // What could fix this?
-    // - stiffness too high => pressure response is very high
-    // - why are particles so close? => particle separation
-        // what should I ideally set particle separation to?
-            // What should it depend on?
-                // multiple of h -> why?
-                // i want to seed particles at less than the radius in which I search for neighbors
-                // true - > but what actually is the radius in which i am search
-    // WHITEBOARDING / LEARNING
-                    // we realize that neighbor search radius in the grid cell is connected to finding enough neighbors
-                    // so, to reach a cell ± 1, we do h = (3/2)*cellsize or cellsize = (2/3)*h
-    
-    // this seems to give me no neighbors - why?
-    // is my particle separation too large - am I seeding particles initially so that they will be in radius h
+    usg = grid(0, 4, cellsize);
 }
 
 void SPHSolver::update() {
@@ -142,6 +112,79 @@ void SPHSolver::update() {
     // compute cell indices of particle based on particle position
     //int i,j,k;
     
+#define USE_TBB
+#ifdef USE_TBB
+    
+    int particle_container_size = ParticlesContainer.size();
+    
+    parallel_for(0, particle_container_size, [&](int i) {
+        //put particles in grid cells
+        Particle* p = ParticlesContainer.at(i);
+            // before I find out index, check if particle is in bounds - collision detect
+            checkBounds(p);
+            
+            // ASSUMPTION - we want to find index after ensuring that particle is in bounds
+            p->i = floor((p->pos.x - usg.grid_min) / usg.cell_size);
+            p->j = floor((p->pos.y - usg.grid_min) / usg.cell_size);
+            p->k = floor((p->pos.z - usg.grid_min) / usg.cell_size);
+            
+            if (p != nullptr && p != NULL){
+                p->gridIndex = usg(p->i,p->j,p->k);
+                if(p->gridIndex > 0 && p->gridIndex < usg.cells.size()) {usg.cells.at(p->gridIndex).push_back(p);}
+            }
+            else{
+                int x=1;
+            }
+        
+    });
+   
+    
+    //assign each particle its neighbors
+    parallel_for(0, particle_container_size, [&](int i) {
+        Particle* p = ParticlesContainer.at(i);
+        p->neighbors.clear();
+        p->neighbors = neighborSearchUSG(p);
+    });
+  
+    parallel_for(0,particle_container_size,[&](int i) {
+        Particle* p = ParticlesContainer.at(i);
+        p->rho = accumulateDensity(p);
+        p->pres = calculatePressure(p->rho);
+        //std::cout<<"density "<< p->rho<<std::endl;
+        //I want density to be +/- 100 from rest density
+    });
+    
+    //resolve forces
+    parallel_for(0,particle_container_size,[&](int i) {
+        Particle* p = ParticlesContainer.at(i);
+        p->f_pressure = pressureForceDensity(p);
+        p->f_gravity = p->rho * glm::vec3(0, -9.81, 0);
+        p->f_visc = viscForceDensity(p);
+        
+        glm::vec3 press_sum = p->f_pressure + p->f_visc;
+        if(press_sum.y > (-1.f * p->f_gravity.y)) {
+            press_sum.y *= -1.5;
+        }
+        p->force_density = press_sum + p->f_gravity;
+    });
+    
+    //update speed
+    parallel_for(0,particle_container_size,[&](int i) {
+        Particle* p = ParticlesContainer.at(i);
+        //LEAPFROG METHOD http://www2.mpia-hd.mpg.de/~dullemon/lectures/fluiddynamics08/chap_10_sph.pdf
+        p->pos = p->pos + .5f * dt_timestep * p->speed;
+        p->speed = p->speed + (dt_timestep * p->force_density/p->rho);
+        p->pos = p->pos + .5f * dt_timestep * p->speed;
+        
+        checkBounds(p);
+    });
+    
+#else
+    not_TBB_update();
+#endif
+}
+
+void SPHSolver::not_TBB_update() {
     //put particles in grid cells
     for(Particle* p: ParticlesContainer) {
         // before I find out index, check if particle is in bounds - collision detect
@@ -160,37 +203,19 @@ void SPHSolver::update() {
             //whyare you here!?
             int x=1;
         }
-
+        
     }
-
+    
     //assign each particle its neighbors
     int a;
     for (int i=0; i<ParticlesContainer.size(); ++i){
-//    for(Particle* p: ParticlesContainer) {
         //clear what neighbors were there, repopulate
         Particle* p = ParticlesContainer.at(i);
         p->neighbors.clear();
         p->neighbors = neighborSearchUSG(p);
-        
-        a = p->neighbors.size();
-        int x=1;
-        int y=2;
     }
     
-//    for(Particle* p: ParticlesContainer) {
-//        //clear what neighbors were there, repopulate
-//        if (p->neighbors.size() < 10) {
-//            std::cout<<"WHYYYYY I HAVE NO FRIENDS";
-//        }
-//    }
-
-//    //find density and pressure
-//    for(Particle* p: ParticlesContainer) {
-//    //how many neighbors do I start with
-//        //if (p->neighbors.size() <30)
-//           // std::cout<<"#neighbors "<<p->neighbors.size()<<std::endl;
-//    }
-    for(Particle* p: ParticlesContainer) {
+       for(Particle* p: ParticlesContainer) {
         p->rho = accumulateDensity(p);
         p->pres = calculatePressure(p->rho);
         //std::cout<<"density "<< p->rho<<std::endl;
@@ -202,13 +227,16 @@ void SPHSolver::update() {
         p->f_pressure = pressureForceDensity(p);
         p->f_gravity = p->rho * glm::vec3(0, -9.81, 0);
         p->f_visc = viscForceDensity(p);
-        p->force_density = p->f_pressure + p->f_gravity + p->f_visc;
+        
+        glm::vec3 press_sum = p->f_pressure + p->f_visc;
+        if(press_sum.y > (-1.f * p->f_gravity.y)) {
+            press_sum.y = 0;
+        }
+        p->force_density = press_sum + p->f_gravity;
     }
-
+    
     //update speed
     for(Particle* p: ParticlesContainer) {
-//        p->speed += p->force_density*dt_timestep/p->rho;
-//        p->pos += p->speed*dt_timestep;
         
         //LEAPFROG METHOD http://www2.mpia-hd.mpg.de/~dullemon/lectures/fluiddynamics08/chap_10_sph.pdf
         p->pos = p->pos + .5f * dt_timestep * p->speed;
@@ -217,17 +245,6 @@ void SPHSolver::update() {
         
         checkBounds(p);
     }
-    for(Particle* p: ParticlesContainer) {
-        if (std::isnan(p->pos.x)){
-            int a =1;
-        }
-    }
-
-    
-}
-
-void SPHSolver::addParticle(Particle* p){
-
 }
 
 //neighbor search
@@ -235,18 +252,14 @@ std::vector<Particle*> SPHSolver::neighborSearchNaive(Particle* p){
     std::vector<Particle*> neighbors;
     for(Particle* n: ParticlesContainer) {
         if(glm::distance(p->pos, n->pos) < h) {
-            p->a = 1;
-            p->r = 0;
-            p->g = 225;
-            p->b = 0;
             neighbors.push_back(n);
         }
     }
     return neighbors;
 }
 
-std::vector<Particle*> SPHSolver::neighborSearchUSG(Particle* p){
-    std::vector<Particle*> neighbors;
+concurrent_vector<Particle*> SPHSolver::neighborSearchUSG(Particle* p){
+    concurrent_vector<Particle*> neighbors;
     for(int x = p->i - 1; x <= p->i + 1; x++) {
         for(int y = p->j - 1; y <= p->j + 1; y++) {
             for(int z = p->k - 1; z <= p->k + 1; z++) {
@@ -257,23 +270,15 @@ std::vector<Particle*> SPHSolver::neighborSearchUSG(Particle* p){
                     if (neighbors.size() > 40) {
                         break;
                     }
-                    neighbors.insert(neighbors.end(), usg.cells.at(idx).begin(), usg.cells.at(idx).end()); //insert the particles in the cell at the end of the neighbors vector
+                    for(Particle* pp : usg.cells.at(idx)) {
+                        neighbors.push_back(pp);
+                    }
+                   // neighbors.insert(neighbors.end(), usg.cells.at(idx).begin(), usg.cells.at(idx).end()); //insert the particles in the cell at the end of the neighbors vector
                 }
             }
         }
     }
-//    if (neighbors.size() < 2) {
-//       // std::cout<<"OH NO!";
-//        // what should I be doing if there's not enough neighbors
-//        // may be they make sure that I am moved to a nearest cell with neighbors
-//        
-//        // or Why am I getting into a situation like this
-//        // may be parameter tuning
-//           // what parameter affects how many neighbors I have?
-//           // particle separation size
-//            // ->
-//            // grid cell size
-//    }
+
     return neighbors;
 }
 
@@ -324,29 +329,21 @@ float SPHSolver::accumulateDensity(Particle* p){
             
             //LEARNING: pressure is high when density is either really high or really low, deviating from the rest density
             //SOLUTION IDEA: stop accumulating density at this point?
-//            if(rho >= d_rest_density + 100) {
-//                break;
-//            }
-            n->a = 1;
-            n->r = 0;
-            n->g = 225;
-            n->b = 0;
+            if(rho >= d_rest_density + 100) {
+                break;
+            }
             float kernel = poly6_kernel(p->pos, n->pos);
             rho += n->mass*kernel;
             
         }
     
-////        std::cout << "RHO: " << rho << std::endl;
-//        if (rho < 0.2*d_rest_density) {
-//            std::cout<<"WHY";
-//        }
-
-        if (fabs(rho) > d_rest_density){
-//            std::cout << "Returning RHO as is" << std::endl;
-            return rho;
-        }
-//    std::cout << "Returning RHO as REST DENSITY" << std::endl;
-    return d_rest_density + rho;
+    if(d_rest_density - 100 < rho && rho <= d_rest_density + 100) {
+        return rho;
+    } else if (d_rest_density - 100 < d_rest_density + rho && d_rest_density + rho <= d_rest_density + 100) {
+        return d_rest_density + rho;
+    }
+    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    return d_rest_density + r*100;
 }
 
 

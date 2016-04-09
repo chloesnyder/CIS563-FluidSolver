@@ -3,6 +3,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "fluidSolver.hpp"
+#include <tbb/tbb.h>
+#include "tbb/concurrent_vector.h"
+using namespace tbb;
 
 class grid {
 public:
@@ -10,7 +13,7 @@ public:
     grid();
     int operator() (int i, int j, int k);
     glm::vec3 dimensions;
-    std::vector<std::vector<Particle*>> cells;
+    concurrent_vector<concurrent_vector<Particle*>> cells;
     int grid_min;
     int grid_max;
     float resolution;

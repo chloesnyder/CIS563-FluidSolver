@@ -18,10 +18,10 @@ glm::mat4 camera::getViewProj()
 }
 
 camera::camera(){
-    theta = -45;
-    phi = -45;
+    theta = 30;
+    phi = -10;
     zoom = 10;
-    fovy = 45;
+    fovy = 60;
     width = 500;
     height = 400;
     near_clip = 0.1f;
