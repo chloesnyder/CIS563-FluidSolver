@@ -9,7 +9,7 @@ SPHSolver::SPHSolver()
 {
     k_stiffness = 1000;
     mu_viscosity = 25;
-    h = .1;//.11001; //radius
+    h = .11001; //radius
     cellsize = 0.5f*h;
 
     h9 = h*h*h*h*h*h*h*h*h;
@@ -40,7 +40,7 @@ void SPHSolver::initParticles() {
     //ParticlesContainer.push_back(p2);
     
     for(float i = 0; i < .3; i += particle_separation) {
-        for(float j = 0; j < 3; j += particle_separation) {
+        for(float j = 0; j < 2; j += particle_separation) {
             for(float k = 0; k < 2; k += particle_separation) {
                 Particle* P = new Particle();
                 P->pos = glm::vec3(i,j,k);
@@ -65,11 +65,11 @@ void SPHSolver::checkBounds(Particle* p) {
     float boundz = 2.f;
     if(p->pos.x > boundx) { //hardcode for now, change later to access correct container scaleMax and mins
         p->pos.x = boundx - epsilon;
-        p->speed *= glm::vec3(-1.1,1,1);
+        p->speed *= glm::vec3(-1,1,1);
         //std::cout << "here  > x" << std::endl;
     } else if (p->pos.x < 0) {
         p->pos.x = 0 + epsilon;
-        p->speed *= glm::vec3(-1.1,1,1);
+        p->speed *= glm::vec3(-1,1,1);
         //std::cout << "here  < x" << std::endl;
     }
     
@@ -85,18 +85,18 @@ void SPHSolver::checkBounds(Particle* p) {
     
     if(p->pos.z > boundz) { //hardcode for now, change later to access correct container scaleMax and mins
         p->pos.z = boundz - epsilon;
-        p->speed *= glm::vec3(1,1,-1.1);
+        p->speed *= glm::vec3(1,1,-1);
         //std::cout << "here  < z" << std::endl;
     } else if (p->pos.z < 0) {
         p->pos.z = 0 + epsilon;
-        p->speed *= glm::vec3(1,1,-1.1);
+        p->speed *= glm::vec3(1,1,-1);
         // std::cout << "here  > z" << std::endl;
     }
 
 }
 
 void SPHSolver::init(){
-    usg = grid(0, 4, cellsize);
+    usg = grid(0, 3, cellsize);
 }
 
 void SPHSolver::update() {
@@ -162,9 +162,9 @@ void SPHSolver::update() {
         p->f_visc = viscForceDensity(p);
         
         glm::vec3 press_sum = p->f_pressure + p->f_visc;
-        if(press_sum.y > (-1.f * p->f_gravity.y)) {
-            press_sum.y *= -1.5;
-        }
+//        if(press_sum.y > (-1.f * p->f_gravity.y)) {
+//            press_sum.y = 0;
+//        }
         p->force_density = press_sum + p->f_gravity;
     });
     
@@ -229,9 +229,9 @@ void SPHSolver::not_TBB_update() {
         p->f_visc = viscForceDensity(p);
         
         glm::vec3 press_sum = p->f_pressure + p->f_visc;
-        if(press_sum.y > (-1.f * p->f_gravity.y)) {
-            press_sum.y = 0;
-        }
+//        if(press_sum.y > (-1.f * p->f_gravity.y)) {
+//            press_sum.y = 0;
+//        }
         p->force_density = press_sum + p->f_gravity;
     }
     
